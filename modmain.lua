@@ -112,9 +112,9 @@ local function Make3x3Chest()
 		type = "chest"
 	}
 
-	for y = 1, 2, 1 do
-		for x = 0, 1 do
-			table.insert(chest.widget.slotpos, GLOBAL.Vector3(75*x-75*2+112, 75*y-75*2+75,0))
+	for y = 2, 0, -1 do
+		for x = 0, 2 do
+			table.insert(chest.widget.slotpos, GLOBAL.Vector3(80*x-80*2+80, 80*y-80*2+80,0))
 		end
 	end
 
@@ -226,7 +226,7 @@ AddRecipe2("crate_material",
 	RegisterInventoryItemAtlas("images/inventoryimages/crate_material.xml", "crate_material.tex")
 	STRINGS.NAMES.CRATE_MATERIAL = "Pitcrate"
 
-params.crate_wooden = Make4x4Chest()
+params.crate_wooden = Make3x3Chest()
 AddRecipe2("crate_wooden", 
 	{
 		Ingredient("boards", 						6), 
@@ -236,7 +236,7 @@ AddRecipe2("crate_wooden",
 	RegisterInventoryItemAtlas("images/inventoryimages/crate_wooden.xml", "crate_wooden.tex")
 	STRINGS.NAMES.CRATE_WOODEN = "Wooden Crate"
 
-params.crate_metal = Make2x2Chest()
+params.crate_metal = Make3x3Chest()
 AddRecipe2("crate_metal", 
 	{
 		Ingredient("cutstone", 						1), 

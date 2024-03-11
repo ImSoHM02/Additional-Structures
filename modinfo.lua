@@ -1,8 +1,8 @@
 description =
 [[
 -V1.0.1-
-Fixed items not showing up when built.
-Cleaned and optimized code.
+Fixed items not showing up when built. Changed Pitcrate to 4x4, removed the destroy button, and made it hammerable. Fixed metal crate crashing game.
+Cleaned and optimized code
 ]]
 
 name 						= "Additional Structures"

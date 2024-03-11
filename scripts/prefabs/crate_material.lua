@@ -21,6 +21,10 @@ local function onclose(inst)
 end
 
 local function onhammered(inst, worker)
+    if inst.components.burnable ~= nil and inst.components.burnable:IsBurning() then
+        inst.components.burnable:Extinguish()
+    end
+    inst.components.lootdropper:DropLoot()
     if inst.components.container ~= nil then
         inst.components.container:DropEverything()
     end
@@ -31,12 +35,14 @@ local function onhammered(inst, worker)
 end
 
 local function onhit(inst, worker)
-	inst.AnimState:PlayAnimation("hit")
-	inst.AnimState:PushAnimation("closed", false)
-	if inst.components.container then 
-		inst.components.container:DropEverything() 
-		inst.components.container:Close()
-	end
+    if not inst:HasTag("burnt") then
+        if inst.components.container ~= nil then
+            inst.components.container:DropEverything()
+            inst.components.container:Close()
+        end
+        inst.AnimState:PlayAnimation("hit")
+        inst.AnimState:PushAnimation("closed", false)
+    end
 end
 
 local function onbuilt(inst)
@@ -44,7 +50,19 @@ local function onbuilt(inst)
 	inst.AnimState:PushAnimation("closed", false)
 end
 
-local function fn(Sim)
+local function onsave(inst, data)
+    if inst.components.burnable ~= nil and inst.components.burnable:IsBurning() or inst:HasTag("burnt") then
+        data.burnt = true
+    end
+end
+
+local function onload(inst, data)
+    if data ~= nil and data.burnt and inst.components.burnable ~= nil then
+        inst.components.burnable.onburnt(inst)
+    end
+end
+
+local function fn()
 	local inst = CreateEntity()
 
     inst.entity:AddTransform()
@@ -52,8 +70,6 @@ local function fn(Sim)
 	inst.entity:AddSoundEmitter()
 	inst.entity:AddMiniMapEntity()
 	inst.entity:AddNetwork()
-	
-	MakeObstaclePhysics(inst, .3)
 		
 	inst.MiniMapEntity:SetIcon("crate_material.tex")
 	
@@ -72,11 +88,7 @@ local function fn(Sim)
         return inst
     end
 
-    inst:ListenForEvent("onbuilt", onbuilt)
-    MakeSnowCovered(inst)
-
     inst:AddComponent("inspectable")
-
 	inst:AddComponent("container")
     inst.components.container:WidgetSetup("crate_material")
     inst.components.container.onopenfn = onopen
@@ -84,12 +96,22 @@ local function fn(Sim)
     inst.components.container.skipclosesnd = true
     inst.components.container.skipopensnd = true
 
+    inst:AddComponent("lootdropper")
     inst:AddComponent("workable")
     inst.components.workable:SetWorkAction(ACTIONS.HAMMER)
     inst.components.workable:SetWorkLeft(4)
     inst.components.workable:SetOnFinishCallback(onhammered)
     inst.components.workable:SetOnWorkCallback(onhit)
-	
+
+    MakeMediumBurnable(inst, nil, nil, true)
+    MakeSmallPropagator(inst)
+
+    inst:ListenForEvent("onbuilt", onbuilt)
+    MakeSnowCovered(inst)
+
+    inst.OnSave = onsave
+    inst.OnLoad = onload
+
     return inst
 end
 
