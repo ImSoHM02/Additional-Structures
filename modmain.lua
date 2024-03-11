@@ -122,36 +122,40 @@ local function Make3x3Chest()
 end
 
 --3x3 crate  w/ button
-local function Make3x3CrateChest()
-	local chest = {
-		widget = {
-			slotpos = {},
-			animbank = "ui_chest_3x3",
-			animbuild = "ui_chest_3x3",
-			pos = GLOBAL.Vector3(0, 200, 0),
-			side_align_tip = 160,
-			buttoninfo = {
-				text = "Hammer",
-				position = Vector3(0, -135, 0),
-				fn = function(inst)
-					if inst.components.container then inst.components.container:DropEverything() end
-					SpawnPrefab("collapse_small").Transform:SetPosition(inst.Transform:GetWorldPosition())
-					inst.SoundEmitter:PlaySound("dontstarve/common/destroy_material")
-					inst:Remove()
-				end,
-			}
-		},
-		type = "chest"
-	}
-
-	for y = 2, 0, -1 do
-		for x = 0, 2 do
-			table.insert(chest.widget.slotpos, GLOBAL.Vector3(80*x-80*2+80, 80*y-80*2+80,0))
-		end
-	end
-
-	return chest
-end
+--local function Make3x3CrateChest()
+--	local chest = {
+--		widget = {
+--			slotpos = {},
+--			animbank = "ui_chest_3x3",
+--			animbuild = "ui_chest_3x3",
+--			pos = GLOBAL.Vector3(0, 200, 0),
+--			side_align_tip = 160,
+--			buttoninfo = {
+--				text = "Hammer",
+--				position = Vector3(0, -135, 0),
+--				fn = function(inst)
+--				    if inst.components.container ~= nil then
+--				        inst.components.container:DropEverything()
+--				    end
+--				    inst.components.lootdropper:DropLoot()
+--				    local fx = SpawnPrefab("collapse_small")
+--				    fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
+--				    fx:SetMaterial("metal")
+--				    inst:Remove()
+--				end,
+--			}
+--		},
+--		type = "chest"
+--	}
+--
+--	for y = 2, 0, -1 do
+--		for x = 0, 2 do
+--			table.insert(chest.widget.slotpos, GLOBAL.Vector3(80*x-80*2+80, 80*y-80*2+80,0))
+--		end
+--	end
+--
+--	return chest
+--end
 --
 
 local function Make4x4Chest()
@@ -211,7 +215,7 @@ AddRecipe2("compost_box",
 	RegisterInventoryItemAtlas("images/inventoryimages/compost_box.xml", "compost_box.tex")
 	STRINGS.NAMES.COMPOST_BOX = "Compost Box"
 
-params.crate_material = Make3x3CrateChest() 
+params.crate_material = Make4x4Chest() 
 AddRecipe2("crate_material", 
 	{
 			Ingredient("boards", 					2), 

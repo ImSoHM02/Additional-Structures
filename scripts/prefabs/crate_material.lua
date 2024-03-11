@@ -18,7 +18,17 @@ end
 local function onclose(inst) 
 	inst.AnimState:PlayAnimation("close")
 	inst.SoundEmitter:PlaySound("dontstarve/wilson/chest_close")		
-end 
+end
+
+local function onhammered(inst, worker)
+    if inst.components.container ~= nil then
+        inst.components.container:DropEverything()
+    end
+    local fx = SpawnPrefab("collapse_small")
+    fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
+    fx:SetMaterial("wood")
+    inst:Remove()
+end
 
 local function onhit(inst, worker)
 	inst.AnimState:PlayAnimation("hit")
@@ -54,16 +64,17 @@ local function fn(Sim)
     inst.AnimState:SetBuild("crate_material")
     inst.AnimState:PlayAnimation("close")
     
-    MakeSnowCoveredPristine(inst)
+	MakeSnowCoveredPristine(inst)
 
-    inst:ListenForEvent("onbuilt", onbuilt)
+    inst.entity:SetPristine()
 
     if not TheWorld.ismastersim then
         return inst
     end
 
-    inst.entity:SetPristine()
-    
+    inst:ListenForEvent("onbuilt", onbuilt)
+    MakeSnowCovered(inst)
+
     inst:AddComponent("inspectable")
 
 	inst:AddComponent("container")
@@ -72,6 +83,12 @@ local function fn(Sim)
     inst.components.container.onclosefn = onclose
     inst.components.container.skipclosesnd = true
     inst.components.container.skipopensnd = true
+
+    inst:AddComponent("workable")
+    inst.components.workable:SetWorkAction(ACTIONS.HAMMER)
+    inst.components.workable:SetWorkLeft(4)
+    inst.components.workable:SetOnFinishCallback(onhammered)
+    inst.components.workable:SetOnWorkCallback(onhit)
 	
     return inst
 end
